@@ -1,0 +1,45 @@
+<?php
+    
+    // Paketlarni olish
+    $data = file_get_contents('php://input');
+    
+    // Paketlarni dekod qilish
+    $data = json_decode($data, true);
+    ob_start();
+    print_r($data);
+    $out = ob_get_clean(); 
+
+    // Paketlarni message.txt faylga solish
+    file_put_contents(__DIR__ . '/message.txt', $out);
+    if (!empty($data['message']['text'])) {
+        $text = $data['message']['text'];
+        echo $text;
+    }
+
+
+
+    //massivni bot() funksiyasiga yuboradi
+    bot("sendMessage",$response);
+    
+    //Bu funksiya botga zapros junatadi
+    function bot($method, $response=[]){
+    $token = "TOKEN";
+    $ch = curl_init('https://api.telegram.org/bot' . $token . '/' . $method);  
+    curl_setopt($ch, CURLOPT_POST, 1);  
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $response);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    curl_exec($ch);
+    curl_close($ch);
+    }
+
+    //typing() funksiyasi
+    function typing($chatid){
+        return bot('sendChatAction',[
+        'chat_id'=>$chatid,
+        'action' =>'typing',  
+        ]);
+    }
+
+
+?>
